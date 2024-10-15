@@ -13,7 +13,8 @@ export default function Outfits(){
         <div>
 
 
-     <h1> OUTFIT</h1>
+     <h1> OuTFIt</h1>
+            <h2>add your inventory in these list</h2>
 
 
         </div>
