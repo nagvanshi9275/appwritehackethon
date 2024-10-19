@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { account } from './appwriteConfig'; // Import Appwrite account config
 
 export const AuthContext = createContext();
@@ -40,3 +40,11 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+
+
+
+
+
+
+

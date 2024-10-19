@@ -21,6 +21,14 @@ import FooterSection from "./FooterSection";
 
 import Login from "./Login";
 
+import CreateOutfit1 from "./CreateOutfit1";
+
+import CreateOutfit2 from "./CreateOutfit2";
+
+import CreateOutfit3 from "./CreateOutfit3"
+
+import Yourpic from "./Yourpic"
+
 const App = () => {
   return (
     <Router>
@@ -50,9 +58,11 @@ const App = () => {
         <Route path="/outfits" element={<Outfits />} />
         <Route path="/events" element={<Events />} />
         <Route path="/analytics" element={<Analytics />} />
-        <Route path="/create-outfit" element={<CreateOutfit />} />
+        <Route path="/create-outfit" element={<CreateOutfit2 />} />
 
         <Route path="/login" element={<Login />} />
+
+        <Route path="/yourpics" element={<Yourpic />} />
 
 
       </Routes>

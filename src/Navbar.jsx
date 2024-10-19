@@ -59,7 +59,7 @@ const Navbar = () => {
         <ListItem button component={Link} to="/wardrobe">
           <ListItemText primary="Wardrobe" />
         </ListItem>
-        <ListItem button component={Link} to="/outfits">
+        <ListItem button component={Link} to="/yourpics">
           <ListItemText primary="Outfits" />
         </ListItem>
         <ListItem button component={Link} to="/events">
@@ -141,7 +141,7 @@ const Navbar = () => {
 
             <Box sx={{ display: 'flex', gap: 4 }}>
               <Button color="inherit" component={Link} to="/wardrobe">Wardrobe</Button>
-              <Button color="inherit" component={Link} to="/outfits">Outfits</Button>
+              <Button color="inherit" component={Link} to="/yourpics">Outfits</Button>
               <Button color="inherit" component={Link} to="/events">Events/Planner</Button>
               <Button color="inherit" component={Link} to="/analytics">Analytics/Trends</Button>
             </Box>

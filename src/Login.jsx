@@ -1,3 +1,4 @@
+
 import React, { useState, useContext } from "react";
 import {
   Container,
@@ -25,41 +26,63 @@ export default function Login() {
     setIsLogin(!isLogin);
   };
 
+  // Function to fetch user details after login
+  const fetchUserDetails = async () => {
+    try {
+      const userDetails = await account.get();
+      console.log("User details:", userDetails);
+      return userDetails; // This will contain email, name, userId, etc.
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      return null;
+    }
+  };
+
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const response = await account.createEmailPasswordSession(email, password);
-      console.log("Logged in:", response);
+      // Create session via Appwrite and store the session data
+      const session = await account.createEmailPasswordSession(email, password);
+      console.log("Logged in:", session);
 
-      // Update global auth state
-      login(response); 
+      // Fetch user details after login
+      const userDetails = await fetchUserDetails();
 
-      // Navigate to the home route on successful login
+      if (userDetails) {
+        // Update global auth state with user details
+        login(userDetails); // Pass user details to the login function in AuthContext
+      }
+
+      // Navigate to home page
       navigate('/');
     } catch (error) {
       console.error("Login error:", error);
-      // Handle error (e.g., show error message)
     }
   };
 
   const handleSignUp = async (event) => {
     event.preventDefault();
     try {
+      // Create user account via Appwrite
       const response = await account.create(ID.unique(), email, password, fullName);
       console.log("Signed up:", response);
 
-      // Automatically log the user in after signup
+      // Automatically log the user in after signing up
       const session = await account.createEmailPasswordSession(email, password);
       console.log("Automatically logged in after sign up");
 
-      // Update global auth state
-      login(session); 
+      // Fetch user details after signup
+      const userDetails = await fetchUserDetails();
 
-      // Navigate to the home route on successful signup
+      if (userDetails) {
+        // Update global auth state with user details
+        login(userDetails); // Pass user details to the login function in AuthContext
+      }
+
+      // Navigate to home page
       navigate('/');
     } catch (error) {
       console.error("Sign up error:", error);
-      // Handle error (e.g., show error message)
     }
   };
 
@@ -158,3 +181,11 @@ export default function Login() {
     </Container>
   );
 }
+
+
+
+
+
+
+
+
