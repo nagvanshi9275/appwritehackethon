@@ -27,7 +27,9 @@ import CreateOutfit2 from "./CreateOutfit2";
 
 import CreateOutfit3 from "./CreateOutfit3"
 
-import Yourpic from "./Yourpic"
+import Yourpic from "./Yourpic";
+
+import Yourpic1 from "./Yourpic1";
 
 const App = () => {
   return (

@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -10,11 +11,10 @@ export default function CreateOutfit2() {
   const streamRef = useRef(null); // Reference for camera stream
   const videoRef = useRef(null);  // Reference for video element
   const inputRef = useRef(null);  // Reference for file input
+  const canvasRef = useRef(null); // Reference for canvas element
 
   const [snapshot, setSnapshot] = useState(null);
-  const canvasRef = useRef(null); // Reference for canvas element
   const [show, setShow] = useState(false);
-  const [url, seturl] = useState(null);
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -55,7 +55,124 @@ export default function CreateOutfit2() {
     };
   }, []);
 
- 
+  // Function to take snapshot from video
+
+/*
+
+  function takeSnapshot() {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+
+    if (canvas && video) {
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;  // Set canvas width to video width
+      canvas.height = video.videoHeight; // Set canvas height to video height
+
+      context.drawImage(video, 0, 0, canvas.width, canvas.height); // Draw video frame to canvas
+
+      // Convert the canvas to a data URL and set it to snapshot state
+      const dataUrl = canvas.toDataURL('image/png');
+      setSnapshot(dataUrl); // Set the captured image as snapshot
+    }
+  }
+
+*/
+
+   // Function to take snapshot from video
+
+   /*
+async function takeSnapshot() {
+  const canvas = canvasRef.current;
+  const video = videoRef.current;
+
+  if (canvas && video) {
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;  // Set canvas width to video width
+    canvas.height = video.videoHeight; // Set canvas height to video height
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height); // Draw video frame to canvas
+
+    // Convert the canvas to a data URL and set it to snapshot state
+    const dataUrl = canvas.toDataURL('image/png');
+    setSnapshot(dataUrl); // Set the captured image as snapshot
+    
+    // Log the image URL to the console
+    console.log("Captured Snapshot URL:", dataUrl);
+
+    try {
+      const fileId = `upload-${user.$id.slice(0, 10)}-${Math.random().toString(36).substring(2, 12)}`;
+
+      // Upload the file to Appwrite storage
+      const response = await storage.createFile(BUCKET_ID, fileId,dataUrl);
+      console.log("Uploaded file:", response);
+
+      // Now update the database with the fileId
+      await addClickTextToDatabase(response.$id);
+
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+
+     
+
+
+
+
+  }
+}
+
+
+*/
+
+
+async function takeSnapshot() {
+  const canvas = canvasRef.current;
+  const video = videoRef.current;
+
+  if (canvas && video) {
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;  // Set canvas width to video width
+    canvas.height = video.videoHeight; // Set canvas height to video height
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height); // Draw video frame to canvas
+
+    // Convert the canvas to a data URL
+    const dataUrl = canvas.toDataURL('image/png');
+    setSnapshot(dataUrl); // Set the captured image as snapshot
+    
+    // Log the image URL to the console
+    console.log("Captured Snapshot URL:", dataUrl);
+
+    try {
+      // Convert the data URL to a Blob
+      const response = await fetch(dataUrl);
+      const blob = await response.blob(); // Create a Blob from the data URL
+      const fileId = `upload-${user.$id.slice(0, 10)}-${Math.random().toString(36).substring(2, 12)}.png`;
+
+      // Create a File object
+      const file = new File([blob], fileId, { type: 'image/png' });
+
+      // Upload the file to Appwrite storage
+      const uploadResponse = await storage.createFile(BUCKET_ID, fileId, file);
+      console.log("Uploaded file:", uploadResponse);
+
+      // Now update the database with the fileId
+      await addClickTextToDatabase(uploadResponse.$id);
+
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
   const getOrCreateDocument = async () => {
     try {
       const userDocumentId = user.$id; // Use the authenticated user's ID as the document ID
@@ -94,16 +211,13 @@ export default function CreateOutfit2() {
       });
 
       console.log("Document updated:", response);
-
-      navigate('/yourpics') // Navigate after uploading
-
+      navigate('/yourpics'); // Navigate after updating
 
     } catch (error) {
       console.error("Error updating document:", error);
     }
   };
 
-  
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file && user) {
@@ -120,10 +234,7 @@ export default function CreateOutfit2() {
       } catch (error) {
         console.error("Error uploading file:", error);
       }
-
     }
-
-
   };
 
   // Trigger file input click when "Upload the Pic" button is clicked
@@ -221,8 +332,6 @@ export default function CreateOutfit2() {
     </Box>
   );
 }
-
-
 
 
 

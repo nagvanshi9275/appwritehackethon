@@ -13,14 +13,19 @@ import {
   useTheme,
   useMediaQuery,
   Avatar,
-  Divider,
 } from "@mui/material";
+
+import * as tf from '@tensorflow/tfjs';
+import * as mobilenet from '@tensorflow-models/mobilenet';
 
 export default function Yourpic() {
   const [user, setUser] = useState(null);
   const [userPics, setUserPics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [photoUrls, setPhotoUrls] = useState([]);  // State to store image URLs
+  const [predictions, setPredictions] = useState({});
+  const [model, setModel] = useState(null);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -28,6 +33,52 @@ export default function Yourpic() {
   const DATABASE_ID = '670d6b3d002583d9a7d3';
   const COLLECTION_ID = '670d71ed00246f60b0ee';
 
+  // Load MobileNet model
+  useEffect(() => {
+    const loadModel = async () => {
+      try {
+        const loadedModel = await mobilenet.load();
+        setModel(loadedModel);
+        console.log('MobileNet model loaded successfully');
+      } catch (error) {
+        console.error('Error loading model:', error);
+      }
+    };
+
+    loadModel();
+  }, []);
+
+  // Classify images whenever the model and photoUrls are available
+  useEffect(() => {
+    if (model && photoUrls.length > 0) {
+      photoUrls.forEach((imageSrc, index) => classifyImage(imageSrc, index));
+    }
+  }, [model, photoUrls]);
+
+  const classifyImage = async (imageSrc, index) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // Ensure cross-origin images can be classified
+    img.src = imageSrc;
+
+    img.onload = async () => {
+      try {
+        const predictions = await model.classify(img);
+        const topPrediction = predictions[0];
+        setPredictions((prevPredictions) => ({
+          ...prevPredictions,
+          [index]: `Prediction: ${topPrediction.className} (Probability: ${topPrediction.probability.toFixed(4)})`,
+        }));
+      } catch (error) {
+        console.error('Error classifying image:', error);
+      }
+    };
+
+    img.onerror = () => {
+      console.error('Error loading image');
+    };
+  };
+
+  // Fetch user data and images
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -49,6 +100,21 @@ export default function Yourpic() {
 
     fetchUserData();
   }, []);
+
+  // Collect image URLs from userPics data
+  useEffect(() => {
+    if (userPics.length > 0) {
+      const allPhotoUrls = [];
+      userPics.forEach((doc) => {
+        allPhotoUrls.push(...doc.image_url);  // Collect all image URLs from userPics
+      });
+      setPhotoUrls(allPhotoUrls);  // Store in photoUrls state
+    }
+  }, [userPics]);
+
+  useEffect(() => {
+    console.log("All Image URLs:", photoUrls);  // Logging image URLs for debugging purposes
+  }, [photoUrls]);
 
   return (
     <Container maxWidth="lg" sx={{ marginTop: "50px" }}>
@@ -110,6 +176,11 @@ export default function Yourpic() {
                           borderRadius: 1,
                         }}
                       />
+                      <Box p={2}>
+                        <Typography variant="body2" color="text.secondary">
+                          {predictions[index] || 'Loading prediction...'}
+                        </Typography>
+                      </Box>
                     </Card>
                   </Grid>
                 ))}

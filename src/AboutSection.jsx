@@ -24,12 +24,12 @@ const AboutSection = () => {
         <Grid item xs={12} sm={4}>
           <Box sx={{ textAlign: 'center' }}>
             <img
-              src="https://i.postimg.cc/RCkVbzwC/DALL-E-2024-10-12-11-55-15-A-stylish-and-modern-wardrobe-background-featuring-neatly-organized-cl.webp" // Replace with actual image path
+              src="https://i.postimg.cc/C1JSRvJV/Untitled-design-1.png" // Replace with actual image path
               alt="Jane Doe"
               style={{ borderRadius: '50%', width: '100px', height: '100px', marginBottom: '16px' }}
             />
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-              Jane Doe
+              Ashish Nagvanshi
             </Typography>
             <Typography variant="body2">
               Founder & CEO
@@ -39,27 +39,27 @@ const AboutSection = () => {
         <Grid item xs={12} sm={4}>
           <Box sx={{ textAlign: 'center' }}>
             <img
-              src="https://i.postimg.cc/RCkVbzwC/DALL-E-2024-10-12-11-55-15-A-stylish-and-modern-wardrobe-background-featuring-neatly-organized-cl.webp" // Replace with actual image path
+              src="https://i.postimg.cc/vHy5FhSt/AI-NAYA.png" // Replace with actual image path
               alt="John Smith"
               style={{ borderRadius: '50%', width: '100px', height: '100px', marginBottom: '16px' }}
             />
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-              John Smith
+              dev Ashish
             </Typography>
             <Typography variant="body2">
-              Lead Developer
+              Lead developer
             </Typography>
           </Box>
         </Grid>
         <Grid item xs={12} sm={4}>
           <Box sx={{ textAlign: 'center' }}>
             <img
-              src="https://i.postimg.cc/RCkVbzwC/DALL-E-2024-10-12-11-55-15-A-stylish-and-modern-wardrobe-background-featuring-neatly-organized-cl.webp" // Replace with actual image path
+              src="https://i.postimg.cc/zBm4q4hf/dp-image.jpg" // Replace with actual image path
               alt="Sarah Johnson"
               style={{ borderRadius: '50%', width: '100px', height: '100px', marginBottom: '16px' }}
             />
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-              Sarah Johnson
+              ux Ashish
             </Typography>
             <Typography variant="body2">
               UX/UI Designer
