@@ -23,7 +23,7 @@ export default function Yourpic() {
   const [userPics, setUserPics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [photoUrls, setPhotoUrls] = useState([]);  // State to store image URLs
+  const [photoUrls, setPhotoUrls] = useState([]);
   const [predictions, setPredictions] = useState({});
   const [model, setModel] = useState(null);
 
@@ -32,6 +32,7 @@ export default function Yourpic() {
 
   const DATABASE_ID = '670d6b3d002583d9a7d3';
   const COLLECTION_ID = '670d71ed00246f60b0ee';
+  const PROJECT_ID = '67066f050003ee6c49a2'; // Adjust this as per your project setup
 
   // Load MobileNet model
   useEffect(() => {
@@ -55,6 +56,7 @@ export default function Yourpic() {
     }
   }, [model, photoUrls]);
 
+  // Function to classify the image using MobileNet
   const classifyImage = async (imageSrc, index) => {
     const img = new Image();
     img.crossOrigin = 'anonymous'; // Ensure cross-origin images can be classified
@@ -62,8 +64,21 @@ export default function Yourpic() {
 
     img.onload = async () => {
       try {
-        const predictions = await model.classify(img);
+        // Create a canvas element
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas dimensions to match the image
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Draw the image onto the canvas
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+
+        // Perform classification using the canvas
+        const predictions = await model.classify(canvas);
         const topPrediction = predictions[0];
+
         setPredictions((prevPredictions) => ({
           ...prevPredictions,
           [index]: `Prediction: ${topPrediction.className} (Probability: ${topPrediction.probability.toFixed(4)})`,
@@ -74,7 +89,7 @@ export default function Yourpic() {
     };
 
     img.onerror = () => {
-      console.error('Error loading image');
+      console.error('Error loading image:', imageSrc);  // Logging image loading errors
     };
   };
 
@@ -92,7 +107,7 @@ export default function Yourpic() {
         setUserPics(response.documents);
         setLoading(false);
       } catch (err) {
-        console.error(err);
+        console.error('Error fetching user data:', err);
         setError("Failed to fetch data");
         setLoading(false);
       }
@@ -106,9 +121,12 @@ export default function Yourpic() {
     if (userPics.length > 0) {
       const allPhotoUrls = [];
       userPics.forEach((doc) => {
-        allPhotoUrls.push(...doc.image_url);  // Collect all image URLs from userPics
+        doc.image_url.forEach((image) => {
+          const imageUrl = `https://cloud.appwrite.io/v1/storage/buckets/670e09ec003860954e5c/files/${image}/view?project=${PROJECT_ID}&mode=admin`;
+          allPhotoUrls.push(imageUrl); // Collect image URLs and store them
+        });
       });
-      setPhotoUrls(allPhotoUrls);  // Store in photoUrls state
+      setPhotoUrls(allPhotoUrls);
     }
   }, [userPics]);
 
@@ -168,7 +186,7 @@ export default function Yourpic() {
                     <Card>
                       <CardMedia
                         component="img"
-                        image={`https://cloud.appwrite.io/v1/storage/buckets/670e09ec003860954e5c/files/${image}/view?project=67066f050003ee6c49a2&mode=admin`}
+                        image={`https://cloud.appwrite.io/v1/storage/buckets/670e09ec003860954e5c/files/${image}/view?project=${PROJECT_ID}&mode=admin`}
                         alt={`Image ${index + 1}`}
                         sx={{
                           width: '100%',
@@ -177,7 +195,18 @@ export default function Yourpic() {
                         }}
                       />
                       <Box p={2}>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography 
+                          variant="body1" 
+                          sx={{
+                            color: 'primary.main', // Use primary theme color for visibility
+                            fontWeight: 'bold',    // Make the text bold for better emphasis
+                            fontSize: '1rem',      // Increase font size slightly
+                            backgroundColor: '#f0f0f0', // Light background for better contrast
+                            padding: '8px',        // Add padding around the text
+                            borderRadius: '8px',   // Rounded corners for the text box
+                            textAlign: 'center',   // Center the text
+                          }}
+                        >
                           {predictions[index] || 'Loading prediction...'}
                         </Typography>
                       </Box>

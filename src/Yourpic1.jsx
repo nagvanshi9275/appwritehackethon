@@ -1,58 +1,42 @@
+import React, { useEffect, useRef } from 'react';
 
+const Yourpic1 = () => {
+  const imgRef = useRef(null);
+  const canvasRef = useRef(null);
 
-//import React from "react";
+  useEffect(() => {
+    const loadOpenCV = async () => {
+      // Wait for OpenCV to be ready
+      await new Promise((resolve) => {
+        window.cv.onRuntimeInitialized = resolve;
+      });
 
-import React, { useState, useEffect } from 'react';
-import * as tf from '@tensorflow/tfjs';
-import * as mobilenet from '@tensorflow-models/mobilenet';
+      // Load the image
+      const imgElement = imgRef.current;
+      const mat = window.cv.imread(imgElement);
+      const grayMat = new window.cv.Mat();
 
-export default function Yourpic1(){
+      // Convert to grayscale
+      window.cv.cvtColor(mat, grayMat, window.cv.COLOR_RGBA2GRAY);
 
-   const [predictions, setPredictions] = useState({});
-   const [model, setModel] = useState(null);
+      // Display the processed image
+      window.cv.imshow(canvasRef.current, grayMat);
 
+      // Cleanup
+      mat.delete();
+      grayMat.delete();
+    };
 
-   useEffect(() => {
-      const loadModel = async () => {
-        try {
-          const loadedModel = await mobilenet.load();
-          setModel(loadedModel);
-          console.log('MobileNet model loaded successfully');
-        } catch (error) {
-          console.error('Error loading model:', error);
-        }
-      };
-  
-      loadModel();
-    }, []);
+    loadOpenCV();
+  }, []);
 
-
-
-   return(
-    
-    <div>
-
-
-     <h1>Live in public</h1>
-
-
-
+  return (
+    <div style={{ marginTop: '220px' }}>
+      <h2>Image Processing with OpenCV.js</h2>
+      <img ref={imgRef} src="https://i.postimg.cc/zBm4q4hf/dp-image.jpg" alt="Input" style={{ display: 'none' }} />
+      <canvas ref={canvasRef}></canvas>
     </div>
+  );
+};
 
-
-
-
-
-   )
-
-
-
-
-}
-
-
-
-
-
-
-
+export default Yourpic1;
