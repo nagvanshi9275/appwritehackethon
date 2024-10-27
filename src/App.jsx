@@ -31,6 +31,10 @@ import Yourpic from "./Yourpic";
 
 import Yourpic1 from "./Yourpic1";
 
+import Yourpic2 from "./Yourpic2";
+
+
+import Yourpic3 from "./Yourpic3"
 const App = () => {
   return (
     <Router>
@@ -76,3 +80,6 @@ const App = () => {
 };
 
 export default App;
+
+
+

@@ -27,6 +27,9 @@ export default function Yourpic() {
   const [predictions, setPredictions] = useState({});
   const [model, setModel] = useState(null);
 
+
+  const kapara = ["jean", "jersey", "abaya"]
+
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -35,6 +38,30 @@ export default function Yourpic() {
   const PROJECT_ID = '67066f050003ee6c49a2'; // Adjust this as per your project setup
 
   // Load MobileNet model
+
+  const counts = kapara.reduce((acc, item) => {
+    acc[item] = Object.values(predictions).filter(i => i === item).length;
+    return acc;
+  }, {});
+
+  useEffect(() => {
+    console.log(`"jeans asas" is present ${counts["jean"]} times in the array.`);
+    console.log(`"jersey" is present ${counts["jersey"]} times in the array.`);
+
+    console.log(`"abaya" is present ${counts["abaya"]} times in the array.`);
+
+
+
+
+
+
+
+  }, [counts]);
+
+
+
+
+
   useEffect(() => {
     const loadModel = async () => {
       try {
@@ -56,42 +83,56 @@ export default function Yourpic() {
     }
   }, [model, photoUrls]);
 
+
+
+  // useEffect(() => {
+
+  //console.log(predictions)
+
+
+  // }, [predictions])
+
+
+
+
+
   // Function to classify the image using MobileNet
   const classifyImage = async (imageSrc, index) => {
     const img = new Image();
     img.crossOrigin = 'anonymous'; // Ensure cross-origin images can be classified
     img.src = imageSrc;
-
+  
     img.onload = async () => {
       try {
         // Create a canvas element
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-
+  
         // Set canvas dimensions to match the image
         canvas.width = img.width;
         canvas.height = img.height;
-
+  
         // Draw the image onto the canvas
         ctx.drawImage(img, 0, 0, img.width, img.height);
-
+  
         // Perform classification using the canvas
         const predictions = await model.classify(canvas);
-        const topPrediction = predictions[0];
-
+        const topPrediction = predictions[0].className.split(",")[0]; // Get the first class name
+  
         setPredictions((prevPredictions) => ({
           ...prevPredictions,
-          [index]: `Prediction: ${topPrediction.className} (Probability: ${topPrediction.probability.toFixed(4)})`,
+          [index]: topPrediction, // Store only the main class name
         }));
       } catch (error) {
         console.error('Error classifying image:', error);
       }
     };
-
+  
     img.onerror = () => {
-      console.error('Error loading image:', imageSrc);  // Logging image loading errors
+      console.error('Error loading image:', imageSrc);
     };
   };
+  
 
   // Fetch user data and images
   useEffect(() => {
@@ -117,6 +158,15 @@ export default function Yourpic() {
   }, []);
 
   // Collect image URLs from userPics data
+
+
+
+
+
+
+
+
+
   useEffect(() => {
     if (userPics.length > 0) {
       const allPhotoUrls = [];
@@ -190,7 +240,7 @@ export default function Yourpic() {
                         alt={`Image ${index + 1}`}
                         sx={{
                           width: '100%',
-                          height: 'auto',
+                          height: '550px',
                           borderRadius: 1,
                         }}
                       />
