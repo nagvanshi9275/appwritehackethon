@@ -1,35 +1,44 @@
 import React, { useEffect } from "react";
 
-export default function Yourpic3() { 
-  const array = ["App", "Web", "Flutter", "App", "Web", "React", "Web"];
-  const sort = ["App", "Web"];
+export default function Yourpic3() {
+  const array = [
+    {
+      img: "https://i.postimg.cc/ZRxzPR7B/6-Sophisticated-Dark-Bedroom-Themes-for-Chic-and-Comfortable-Homes-333-Art-Images.jpg",
+      name: "Room",
+    },
+    {
+      img: "https://i.postimg.cc/k5ZvjFHL/adobe.jpg",
+      name: "Sunder",
+    },
+    {
+      img: "https://i.postimg.cc/j2GVt7C1/bangluru.jpg",
+      name: "Room",
+    },
+  ];
 
-  // Count occurrences of "App" and "Web"
-  const counts = sort.reduce((acc, item) => {
-    acc[item] = array.filter(i => i === item).length;
-    return acc;
-  }, {});
+  // Filter the array to get only the entries where name is "Room"
+  const roomImages = array.filter((item) => item.name === "Room");
 
-  // Use useEffect to log the counts when the component mounts
+  // Log the filtered values in the console
   useEffect(() => {
-    console.log(`"App" is present ${counts["App"]} times in the array.`);
-    console.log(`"Web" is present ${counts["Web"]} times in the array.`);
-  }, [counts]);
+    console.log('Filtered "Room" items:', roomImages);
+  }, [roomImages]);
 
-  // Render "App" and "Web" based on their counts
-  const renderApp = Array.from({ length: counts["App"] }).map((_, index) => (
-    <h1 key={`app-${index}`}>App</h1>
-  ));
-
-  const renderWeb = Array.from({ length: counts["Web"] }).map((_, index) => (
-    <h1 key={`web-${index}`}>Web</h1>
+  // Render the filtered room images
+  const renderRoomImages = roomImages.map((pre, index) => (
+    <div key={index}>
+      <img style={{ width: "90px", height: "80px" }} src={pre.img} alt={pre.name} />
+      <p>{pre.name}</p>
+    </div>
   ));
 
   return (
-    <div style={{ marginTop: "300px" }}>
-      <h1>Experiment</h1>
-      {renderApp}
-      {renderWeb}
+    <div style={{ marginTop: "180px" }}>
+      {/* Display the filtered images */}
+      {renderRoomImages}
+
+      {/* Optionally, you can show the total count of "Room" entries */}
+      <p>Total 'Room' entries: {roomImages.length}</p>
     </div>
   );
 }

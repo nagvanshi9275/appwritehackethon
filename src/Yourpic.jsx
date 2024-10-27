@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from "react";
 import { account, database } from "./appwriteConfig";
 import { Query } from 'appwrite';
@@ -26,42 +28,18 @@ export default function Yourpic() {
   const [photoUrls, setPhotoUrls] = useState([]);
   const [predictions, setPredictions] = useState({});
   const [model, setModel] = useState(null);
-
-
-  const kapara = ["jean", "jersey", "abaya"]
+  const [jeanImages, setJeanImages] = useState([]); // Array to store "jean" images
+  const [abayaImages, setAbayaImages] = useState([]); // Array to store "abaya" images
+  const [jerseyImages, setJerseyImages] = useState([]); // Array to store "jersey" images
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const DATABASE_ID = '670d6b3d002583d9a7d3';
   const COLLECTION_ID = '670d71ed00246f60b0ee';
-  const PROJECT_ID = '67066f050003ee6c49a2'; // Adjust this as per your project setup
+  const PROJECT_ID = '67066f050003ee6c49a2';
 
   // Load MobileNet model
-
-  const counts = kapara.reduce((acc, item) => {
-    acc[item] = Object.values(predictions).filter(i => i === item).length;
-    return acc;
-  }, {});
-
-  useEffect(() => {
-    console.log(`"jeans asas" is present ${counts["jean"]} times in the array.`);
-    console.log(`"jersey" is present ${counts["jersey"]} times in the array.`);
-
-    console.log(`"abaya" is present ${counts["abaya"]} times in the array.`);
-
-
-
-
-
-
-
-  }, [counts]);
-
-
-
-
-
   useEffect(() => {
     const loadModel = async () => {
       try {
@@ -72,69 +50,80 @@ export default function Yourpic() {
         console.error('Error loading model:', error);
       }
     };
-
     loadModel();
   }, []);
 
-  // Classify images whenever the model and photoUrls are available
+  // Ensure only unique URLs are classified
   useEffect(() => {
     if (model && photoUrls.length > 0) {
-      photoUrls.forEach((imageSrc, index) => classifyImage(imageSrc, index));
+      const uniqueUrls = [...new Set(photoUrls)]; // Remove duplicates
+      uniqueUrls.forEach((imageSrc, index) => classifyImage(imageSrc, index));
     }
   }, [model, photoUrls]);
-
-
-
-  // useEffect(() => {
-
-  //console.log(predictions)
-
-
-  // }, [predictions])
-
-
-
-
 
   // Function to classify the image using MobileNet
   const classifyImage = async (imageSrc, index) => {
     const img = new Image();
-    img.crossOrigin = 'anonymous'; // Ensure cross-origin images can be classified
+    img.crossOrigin = 'anonymous';
     img.src = imageSrc;
-  
+
     img.onload = async () => {
       try {
-        // Create a canvas element
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-  
-        // Set canvas dimensions to match the image
+
         canvas.width = img.width;
         canvas.height = img.height;
-  
-        // Draw the image onto the canvas
         ctx.drawImage(img, 0, 0, img.width, img.height);
-  
-        // Perform classification using the canvas
+
         const predictions = await model.classify(canvas);
-        const topPrediction = predictions[0].className.split(",")[0]; // Get the first class name
-  
+        const topPrediction = predictions[0].className.split(",")[0];
+
         setPredictions((prevPredictions) => ({
           ...prevPredictions,
-          [index]: topPrediction, // Store only the main class name
+          [index]: topPrediction,
         }));
+
+        // If the prediction is "jean", add it to the jeanImages array
+        if (topPrediction.toLowerCase() === "jean") {
+          setJeanImages((prevJeanImages) => {
+            const isAlreadyIncluded = prevJeanImages.some(item => item.img === imageSrc);
+            if (!isAlreadyIncluded) {
+              return [...prevJeanImages, { img: imageSrc, name: "jean" }];
+            }
+            return prevJeanImages;
+          });
+        } 
+        // If the prediction is "abaya", add it to the abayaImages array
+        else if (topPrediction.toLowerCase() === "abaya") {
+          setAbayaImages((prevAbayaImages) => {
+            const isAlreadyIncluded = prevAbayaImages.some(item => item.img === imageSrc);
+            if (!isAlreadyIncluded) {
+              return [...prevAbayaImages, { img: imageSrc, name: "abaya" }];
+            }
+            return prevAbayaImages;
+          });
+        }
+        // If the prediction is "jersey", add it to the jerseyImages array
+        else if (topPrediction.toLowerCase() === "jersey") {
+          setJerseyImages((prevJerseyImages) => {
+            const isAlreadyIncluded = prevJerseyImages.some(item => item.img === imageSrc);
+            if (!isAlreadyIncluded) {
+              return [...prevJerseyImages, { img: imageSrc, name: "jersey" }];
+            }
+            return prevJerseyImages;
+          });
+        }
       } catch (error) {
         console.error('Error classifying image:', error);
       }
     };
-  
+
     img.onerror = () => {
       console.error('Error loading image:', imageSrc);
     };
   };
-  
 
-  // Fetch user data and images
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -158,31 +147,28 @@ export default function Yourpic() {
   }, []);
 
   // Collect image URLs from userPics data
-
-
-
-
-
-
-
-
-
   useEffect(() => {
     if (userPics.length > 0) {
       const allPhotoUrls = [];
       userPics.forEach((doc) => {
         doc.image_url.forEach((image) => {
           const imageUrl = `https://cloud.appwrite.io/v1/storage/buckets/670e09ec003860954e5c/files/${image}/view?project=${PROJECT_ID}&mode=admin`;
-          allPhotoUrls.push(imageUrl); // Collect image URLs and store them
+          if (!allPhotoUrls.includes(imageUrl)) {
+            allPhotoUrls.push(imageUrl);
+          }
         });
       });
       setPhotoUrls(allPhotoUrls);
     }
   }, [userPics]);
 
+  // Log URLs and image arrays for debugging
   useEffect(() => {
-    console.log("All Image URLs:", photoUrls);  // Logging image URLs for debugging purposes
-  }, [photoUrls]);
+    console.log("All Image URLs:", photoUrls);
+    console.log("Jean Images Array:", jeanImages);
+    console.log("Abaya Images Array:", abayaImages);
+    console.log("Jersey Images Array:", jerseyImages);
+  }, [photoUrls, jeanImages, abayaImages, jerseyImages]);
 
   return (
     <Container maxWidth="lg" sx={{ marginTop: "50px" }}>
@@ -248,13 +234,13 @@ export default function Yourpic() {
                         <Typography 
                           variant="body1" 
                           sx={{
-                            color: 'primary.main', // Use primary theme color for visibility
-                            fontWeight: 'bold',    // Make the text bold for better emphasis
-                            fontSize: '1rem',      // Increase font size slightly
-                            backgroundColor: '#f0f0f0', // Light background for better contrast
-                            padding: '8px',        // Add padding around the text
-                            borderRadius: '8px',   // Rounded corners for the text box
-                            textAlign: 'center',   // Center the text
+                            color: 'primary.main',
+                            fontWeight: 'bold',
+                            fontSize: '1rem',
+                            backgroundColor: '#f0f0f0',
+                            padding: '8px',
+                            borderRadius: '8px',
+                            textAlign: 'center',
                           }}
                         >
                           {predictions[index] || 'Loading prediction...'}
@@ -266,14 +252,23 @@ export default function Yourpic() {
               </Grid>
             </Box>
           ))}
-        </Box>
-      )}
 
-      {!loading && userPics.length === 0 && (
-        <Typography align="center" my={4}>
-          No pictures found for your account.
-        </Typography>
+  
+
+  
+
+
+    
+        </Box>
       )}
     </Container>
   );
 }
+
+
+
+
+
+
+
+
